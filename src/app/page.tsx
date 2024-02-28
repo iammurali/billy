@@ -95,9 +95,15 @@ export default function Home() {
   };
   const getCategories = async () => {
     const db = await Database.load('sqlite:billy.db');
-    const result: Category[] = await db.select('SELECT * from category;');
-    console.log('categories::::', result);
-    setCategories(result);
+    try {   
+      const result: Category[] = await db.select('SELECT * from category;');
+      console.log('categories::::', result);
+      setCategories(result);
+    } catch (error) {
+      console.log(error)
+    } finally {
+      await db.close();
+    }
   };
   const getBillsWithBillItems = async () => {
     const db = await dbInstance();
@@ -202,6 +208,10 @@ export default function Home() {
     console.log('Printing bill...');
   };
 
+  const clearBill = () => {
+    setBillItems([]);
+  }
+
   return (
     <main className="flex h-screen">
       <div className="h-full flex flex-col w-full">
@@ -303,6 +313,9 @@ export default function Home() {
               <div className="flex flex-row justify-between p-2">
                 <div>Sub Total</div>
                 <div>Rs. {TotalAmount}</div>
+                <button className="bg-zinc-700 p-1" onClick={() => clearBill()}>
+                  Clear Bill
+                </button>
                 <button className="bg-zinc-700 p-1" onClick={() => saveBill()}>
                   Save Bill
                 </button>
