@@ -1,5 +1,6 @@
 'use client'; // research about this
 import { Input } from '@/components/ui/input';
+import { DatabaseService } from '@/lib/db';
 import { cn } from '@/lib/utils';
 import { get } from 'http';
 import Link from 'next/link';
@@ -7,17 +8,7 @@ import React, { use, useEffect, useState } from 'react';
 
 import Database from 'tauri-plugin-sql-api';
 
-const data = [
-  { id: 1, name: 'Filter coffee', category: 'drinks' },
-  { id: 2, name: 'Tea', category: 'drinks' },
-  { id: 3, name: 'Samosa', category: 'snacks' },
-];
-
-// const categories = [
-//   { id: 1, category: "All" },
-//   { id: 2, category: "drinks" },
-//   { id: 3, category: "snacks" },
-// ];
+const dbService = new DatabaseService()
 
 export default function Home() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -32,6 +23,7 @@ export default function Home() {
   };
 
   useEffect(() => {
+    // truncateData()
     // addSeedData();
     getMenuItems();
     getCategories();
@@ -52,7 +44,24 @@ export default function Home() {
     return db;
   };
 
+  const truncateData = async () => {
+    const db = await dbInstance();
+    try {
+      await db.execute('DELETE FROM menu_items;');
+      await db.execute('DELETE FROM users;');
+      await db.execute('DELETE FROM category;');
+
+      console.log('Truncated data')
+    } catch (error) {
+      console.log(error)
+
+    } finally {
+      await db.close()
+    }
+  }
+
   const addSeedData = async () => {
+    // console.log('seed data inserted')
     const db = await dbInstance();
 
     try {
@@ -67,11 +76,11 @@ export default function Home() {
       );
 
       const insertCategory = await db.execute(
-        "INSERT INTO category (name) VALUES ('Beverages'), ('Snacks'), ('Toys'), ('Juice'), ('Fried');"
+        "INSERT INTO category (id, name) VALUES (1,'Beverages'), (2, 'Snacks'), (3, 'Toys'), (4, 'Juice'), (5, 'Fried');"
       );
 
       const insertMenuItems = await db.execute(
-        "INSERT INTO menu_items (name, category_id, price) VALUES ('Tea', ?, 15.0), ('Coffee', ?, 12.5), ('Burger', ?, 8.99), ('Pizza', ?, 20.0), ('Salad', ?, 7.5);",
+        "INSERT INTO menu_items (id, name, category_id, price) VALUES (1, 'Tea', ?, 15.0), (2,'Coffee', ?, 12.5), (3,'Burger', ?, 8.99), (4,'Pizza', ?, 20.0), (5,'Salad', ?, 7.5);",
         [1, 2, 3, 4, 5]
       );
 
@@ -86,70 +95,72 @@ export default function Home() {
   };
 
   const getMenuItems = async () => {
-    const db = await Database.load('sqlite:billy.db');
-    const result: MenuItem[] = await db.select('SELECT * from menu_items;');
-
-    console.log('MENU ITEMS::::', result);
-    setMenuItems(result);
-    setFilteredData(result);
+    try {
+      const result = await dbService.getMenuItems()
+      setMenuItems(result);
+      setFilteredData(result);
+    } catch (error) {
+      console.log(error)
+    }
   };
   const getCategories = async () => {
-    const db = await Database.load('sqlite:billy.db');
-    try {   
-      const result: Category[] = await db.select('SELECT * from category;');
+    try {
+      const result: Category[] = await dbService.getCategories()
       console.log('categories::::', result);
       setCategories(result);
     } catch (error) {
       console.log(error)
-    } finally {
-      await db.close();
     }
   };
   const getBillsWithBillItems = async () => {
     const db = await dbInstance();
-    // const result: BillItem[] = await db.select(
-    //   'SELECT * from bill_items;'
-    // );
-    // console.log('BILLS::::', result);
-    // get bill items with menu items and bill details in a single query
-    const result: any[] = await db.select(
-      'SELECT b.id as bill_id, b.total, b.date, bi.quantity, m.id as menu_item_id, m.name, m.category_id, m.price FROM bills b JOIN bill_items bi ON b.id = bi.bill_id JOIN menu_items m ON bi.menu_item_id = m.id;'
-    );
-    // change the result to a map of bill interface
-    const bills: Bill[] = [];
-    result.forEach((row) => {
-      const bill = bills.find((bill) => bill.id === row.bill_id);
-      if (bill) {
-        bill.items.push({
-          quantity: row.quantity,
-          item: {
-            id: row.menu_item_id,
-            name: row.name,
-            category_id: row.category_id,
-            price: row.price,
-          },
-        });
-      } else {
-        bills.push({
-          id: row.bill_id,
-          total: row.total,
-          date: row.date,
-          items: [
-            {
-              quantity: row.quantity,
-              item: {
-                id: row.menu_item_id,
-                name: row.name,
-                category_id: row.category_id,
-                price: row.price,
-              },
-            },
-          ],
-        });
-      }
-    });
 
-    console.log('BILLS::::', bills);
+    try {
+      const result: any[] = await db.select(
+        'SELECT b.id as bill_id, b.total, b.date, bi.quantity, m.id as menu_item_id, m.name, m.category_id, m.price FROM bills b JOIN bill_items bi ON b.id = bi.bill_id JOIN menu_items m ON bi.menu_item_id = m.id;'
+      );
+      // change the result to a map of bill interface
+      const bills: Bill[] = [];
+      result.forEach((row) => {
+        const bill = bills.find((bill) => bill.id === row.bill_id);
+        if (bill) {
+          bill.items.push({
+            quantity: row.quantity,
+            item: {
+              id: row.menu_item_id,
+              name: row.name,
+              category_id: row.category_id,
+              price: row.price,
+            },
+          });
+        } else {
+          bills.push({
+            id: row.bill_id,
+            total: row.total,
+            date: row.date,
+            items: [
+              {
+                quantity: row.quantity,
+                item: {
+                  id: row.menu_item_id,
+                  name: row.name,
+                  category_id: row.category_id,
+                  price: row.price,
+                },
+              },
+            ],
+          });
+        }
+      });
+
+      console.log('BILLS::::', bills);
+
+    } catch (error) {
+      console.log('Bill items test', error)
+    } finally {
+      await db.close();
+    }
+
   };
 
   const filterMenuItems = (categoryId: number) => {
@@ -177,30 +188,24 @@ export default function Home() {
   };
 
   const saveBill = async () => {
-    const db = await dbInstance();
     try {
-      const insertBill = await db.execute(
-        'INSERT INTO bills (total, date) VALUES (?, ?);',
+      const insertBill = await dbService.insertBill(
         [TotalAmount, new Date()]
-      );
+        );
       console.log('INSERTED BILL:', insertBill);
 
       const billId = insertBill.lastInsertId;
       console.log('BILL ID:', billId);
-
-      const insertBillItems = await Promise.all(
+      // insert billItems for the bill
+      await Promise.all(
         billItems.map((billItem) => {
-          return db.execute(
-            'INSERT INTO bill_items (bill_id, menu_item_id, quantity) VALUES (?, ?, ?);',
+          return dbService.insertBillItems(
             [billId, billItem.item.id, billItem.quantity]
           );
         })
       );
-      console.log('INSERTED BILL ITEMS:', insertBillItems);
     } catch (error) {
       console.error('Error saving bill:', error);
-    } finally {
-      await db.close();
     }
   };
 
