@@ -63,6 +63,14 @@ export class DatabaseService {
     return this.executeQuery<QueryResult>('INSERT INTO bill_items (bill_id, menu_item_id, quantity) VALUES (?, ?, ?);', params);
   }
 
+  public async truncateTables(): Promise<void> {
+    await this.executeQuery<void>('DELETE FROM bill_items;');
+    await this.executeQuery<void>('DELETE FROM bills;');
+    await this.executeQuery<void>('DELETE FROM menu_items;');
+    await this.executeQuery<void>('DELETE FROM users;');
+    await this.executeQuery<void>('DELETE FROM category;');
+  }
+
   
 }
 

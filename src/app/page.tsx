@@ -1,12 +1,16 @@
 'use client'; // research about this
+
+import Link from 'next/link';
+import React, { use, useCallback, useEffect, useState } from 'react';
+import Database from 'tauri-plugin-sql-api';
+
 import { Input } from '@/components/ui/input';
+import { toast } from "sonner"
+
 import { DatabaseService } from '@/lib/db';
 import { cn } from '@/lib/utils';
-import { get } from 'http';
-import Link from 'next/link';
-import React, { use, useEffect, useState } from 'react';
+import SearchComponent from '@/components/search-component';
 
-import Database from 'tauri-plugin-sql-api';
 
 const dbService = new DatabaseService()
 
@@ -21,6 +25,10 @@ export default function Home() {
   const searchItem = (searchText: string) => {
     console.log('Search text', searchText);
   };
+
+  const truncateData = async () => {
+    await dbService.truncateTables()
+  }
 
   useEffect(() => {
     // truncateData()
@@ -44,21 +52,7 @@ export default function Home() {
     return db;
   };
 
-  const truncateData = async () => {
-    const db = await dbInstance();
-    try {
-      await db.execute('DELETE FROM menu_items;');
-      await db.execute('DELETE FROM users;');
-      await db.execute('DELETE FROM category;');
 
-      console.log('Truncated data')
-    } catch (error) {
-      console.log(error)
-
-    } finally {
-      await db.close()
-    }
-  }
 
   const addSeedData = async () => {
     // console.log('seed data inserted')
@@ -79,10 +73,24 @@ export default function Home() {
         "INSERT INTO category (id, name) VALUES (1,'Beverages'), (2, 'Snacks'), (3, 'Toys'), (4, 'Juice'), (5, 'Fried');"
       );
 
-      const insertMenuItems = await db.execute(
-        "INSERT INTO menu_items (id, name, category_id, price) VALUES (1, 'Tea', ?, 15.0), (2,'Coffee', ?, 12.5), (3,'Burger', ?, 8.99), (4,'Pizza', ?, 20.0), (5,'Salad', ?, 7.5);",
-        [1, 2, 3, 4, 5]
-      );
+      const categoryNames: any = {
+        1: ['Tea', 'Coffee', 'Iced Tea', 'Smoothie', 'Hot Chocolate', 'Milkshake', 'Soda', 'Lemonade', 'Fruit Juice', 'Water'],
+        2: ['Burger', 'Pizza', 'Sandwich', 'Nachos', 'French Fries', 'Chicken Wings', 'Mozzarella Sticks', 'Quesadilla', 'Spring Rolls', 'Pretzels'],
+        3: ['Toy 1', 'Toy 2', 'Toy 3', 'Toy 4', 'Toy 5', 'Toy 6', 'Toy 7', 'Toy 8', 'Toy 9', 'Toy 10'],
+        4: ['Orange Juice', 'Apple Juice', 'Grape Juice', 'Pineapple Juice', 'Cranberry Juice', 'Carrot Juice', 'Tomato Juice', 'Watermelon Juice', 'Coconut Water', 'Mango Juice'],
+        5: ['Fried Chicken', 'Fried Fish', 'Fried Shrimp', 'Fried Calamari', 'Fried Tofu', 'Fried Pickles', 'Fried Okra', 'Fried Zucchini', 'Fried Cheese', 'Fried Mushrooms'],
+      };
+
+      const insertMenuItems = await db.execute(`
+        INSERT INTO menu_items (name, category_id, price)
+        VALUES
+        ${Array.from({ length: 50 }, (_, index) => {
+        const categoryId = Math.ceil((index + 1) / 10);
+        const itemName = categoryNames[categoryId][index % 10];
+        const price = Math.floor(Math.random() * (20 - 5) + 5); // Random price between 5 and 20
+        return `('${itemName}', ${categoryId}, ${price})`;
+      }).join(',\n')};
+      `);
 
       console.log('INSERTED USERS:', insertUsers);
       console.log('INSERTED CATEGORY:', insertCategory);
@@ -191,7 +199,7 @@ export default function Home() {
     try {
       const insertBill = await dbService.insertBill(
         [TotalAmount, new Date()]
-        );
+      );
       console.log('INSERTED BILL:', insertBill);
 
       const billId = insertBill.lastInsertId;
@@ -204,6 +212,8 @@ export default function Home() {
           );
         })
       );
+      setBillItems([])
+      toast('Bill saved successfully', { position: 'top-center', duration: 1000 })
     } catch (error) {
       console.error('Error saving bill:', error);
     }
@@ -218,9 +228,9 @@ export default function Home() {
   }
 
   return (
-    <main className="flex h-screen">
+    <main className="flex h-screen min-w-96">
       <div className="h-full flex flex-col w-full">
-        <div className="border-b border-zinc-700 bg-zinc-800 p-2 flex flex-row justify-start font-light text-sm">
+        <div className="border-b border-zinc-700 bg-zinc-800 flex flex-row justify-start font-light text-sm h-9">
           <Link
             href={'/manage-menu'}
             className="border-zinc-600 text-left hover:bg-zinc-500 px-2 py-1 rounded-sm"
@@ -243,16 +253,17 @@ export default function Home() {
         <div className="flex flex-row h-full">
           <div className="h-full w-1/2 min-w-96">
             <div className="flex flex-col h-full p-2">
-              <div className="">
-                <Input
+              <div className="flex flex-col w-full">
+                {/* <Input
                   className="w-full p-6 border border-zinc-700 rounded-none"
                   type="search"
                   placeholder="Press space to start search or click on the input box"
                   onChange={(e) => searchItem(e.target.value)}
-                />
+                /> */}
+                <SearchComponent data={filteredData} />
               </div>
-              <div className="border border-zinc-700 mt-2 flex flex-row flex-1">
-                <div className="w-[15%] min-w-28 p-1 border-r border-zinc-700">
+              <div className="border border-zinc-700 mt-2 flex flex-row h-[91%] max-h-[91%]">
+                <div className="w-[17%] min-w-28 p-1 border-r border-zinc-700 h-full">
                   <div
                     onClick={() => {
                       setSelectedCategory(-1);
@@ -281,7 +292,7 @@ export default function Home() {
                     </div>
                   ))}
                 </div>
-                <div className="min-w-96 w-[85%] p-1">
+                <div className="min-w-96 w-[83%] p-1 h-full overflow-y-scroll">
                   {filteredData.map((item) => (
                     <div
                       onClick={() => addItemToBill(item)}
