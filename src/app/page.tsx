@@ -205,13 +205,14 @@ export default function Home() {
       const billId = insertBill.lastInsertId;
       console.log('BILL ID:', billId);
       // insert billItems for the bill
-      await Promise.all(
-        billItems.map((billItem) => {
-          return dbService.insertBillItems(
-            [billId, billItem.item.id, billItem.quantity]
-          );
-        })
-      );
+      await dbService.bulkInsertBillItems(billItems, billId)
+      // await Promise.all(
+      //   billItems.map((billItem) => {
+      //     return dbService.insertBillItems(
+      //       [billId, billItem.item.id, billItem.quantity]
+      //     );
+      //   })
+      // );
       setBillItems([])
       toast('Bill saved successfully', { position: 'top-center', duration: 1000 })
     } catch (error) {
@@ -228,32 +229,13 @@ export default function Home() {
   }
 
   return (
-    <main className="flex h-screen min-w-96">
-      <div className="h-full flex flex-col w-full">
-        <div className="border-b border-zinc-700 bg-zinc-800 flex flex-row justify-start font-light text-sm h-9">
-          <Link
-            href={'/manage-menu'}
-            className="border-zinc-600 text-left hover:bg-zinc-500 px-2 py-1 rounded-sm"
-          >
-            Manage menu
-          </Link>
-          <Link
-            href={'/reports'}
-            className="border-zinc-600 text-center hover:bg-zinc-500 px-2 py-1 rounded-sm"
-          >
-            Reports
-          </Link>
-          <Link
-            href={'/bills'}
-            className="border-zinc-600 text-center hover:bg-zinc-500 px-2 py-1 rounded-sm"
-          >
-            Bills
-          </Link>
-        </div>
-        <div className="flex flex-row h-full">
-          <div className="h-full w-1/2 min-w-96">
-            <div className="flex flex-col h-full p-2">
-              <div className="flex flex-col w-full">
+      <div className={`flex flex-row w-full`} style={{ height: "calc(100% - 1.75rem)"}}>
+        {/* // Nav Container */}
+
+          <div className="w-1/2 min-w-96 py-2 px-2 h-full">
+            <div className="flex flex-col h-full">
+              {/* input */}
+              <div className="flex flex-col w-full h-12">
                 {/* <Input
                   className="w-full p-6 border border-zinc-700 rounded-none"
                   type="search"
@@ -262,8 +244,10 @@ export default function Home() {
                 /> */}
                 <SearchComponent data={filteredData} />
               </div>
-              <div className="border border-zinc-700 mt-2 flex flex-row h-[91%] max-h-[91%]">
-                <div className="w-[17%] min-w-28 p-1 border-r border-zinc-700 h-full">
+              {/* cat and menu container */}
+              <div className="border border-zinc-700 mt-2 flex flex-row"   style={{ height: "calc(100% - 3.5rem)"}}>
+                {/* category */}
+                <div className="min-w-28 p-1 border-r border-zinc-700">
                   <div
                     onClick={() => {
                       setSelectedCategory(-1);
@@ -292,7 +276,8 @@ export default function Home() {
                     </div>
                   ))}
                 </div>
-                <div className="min-w-96 w-[83%] p-1 h-full overflow-y-scroll">
+                {/* menu items */}
+                <div className="min-w-96 p-1 flex-1 overflow-y-auto">
                   {filteredData.map((item) => (
                     <div
                       onClick={() => addItemToBill(item)}
@@ -308,8 +293,8 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div className="bg-green h-full w-1/2 min-w-96 py-2 pr-2">
-            <div className="border border-zinc-700 flex flex-col h-full">
+          <div className="h-full w-1/2 min-w-96 py-2 pr-2">
+            <div className="border border-zinc-700 flex flex-col h-full flex-1 overflow-y-auto">
               <div className="flex flex-row justify-between p-2">
                 <div className="text-xl">Bill</div>
                 <div className="text-xl">Total: Rs. {TotalAmount}</div>
@@ -341,8 +326,8 @@ export default function Home() {
               </div>
             </div>
           </div>
-        </div>
+
+
       </div>
-    </main>
   );
 }

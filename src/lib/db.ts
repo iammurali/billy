@@ -59,6 +59,22 @@ export class DatabaseService {
     return this.executeQuery<QueryResult>('INSERT INTO bills (total, date) VALUES (?, ?);', params);
   }
 
+  public async bulkInsertBillItems(billItems: BillItem[], billId: number) {
+    const db = await this.openConnection();
+    try {
+      await Promise.all(
+        billItems.map((billItem) => {
+          return db.execute(
+            'INSERT INTO bill_items (bill_id, menu_item_id, quantity) VALUES (?, ?, ?);',
+            [billId, billItem.item.id, billItem.quantity]
+          );
+        })
+      )
+    } finally {
+      await this.closeConnection();
+    }
+  }
+
   public async insertBillItems(params: any[]): Promise<QueryResult> {
     return this.executeQuery<QueryResult>('INSERT INTO bill_items (bill_id, menu_item_id, quantity) VALUES (?, ?, ?);', params);
   }
