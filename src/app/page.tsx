@@ -1,18 +1,16 @@
 'use client'; // research about this
 
-import Link from 'next/link';
 import React, { use, useCallback, useEffect, useState } from 'react';
 import Database from 'tauri-plugin-sql-api';
 
-import { Input } from '@/components/ui/input';
-import { toast } from "sonner"
+import { toast } from 'sonner';
 
 import { DatabaseService } from '@/lib/db';
 import { cn } from '@/lib/utils';
 import SearchComponent from '@/components/search-component';
+import { Trash2 } from 'lucide-react';
 
-
-const dbService = new DatabaseService()
+const dbService = new DatabaseService();
 
 export default function Home() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -27,11 +25,11 @@ export default function Home() {
   };
 
   const truncateData = async () => {
-    await dbService.truncateTables()
-  }
+    await dbService.truncateTables();
+  };
 
   useEffect(() => {
-    // truncateData()
+    // truncateData();
     // addSeedData();
     getMenuItems();
     getCategories();
@@ -51,8 +49,6 @@ export default function Home() {
     const db = await Database.load('sqlite:billy.db');
     return db;
   };
-
-
 
   const addSeedData = async () => {
     // console.log('seed data inserted')
@@ -74,22 +70,77 @@ export default function Home() {
       );
 
       const categoryNames: any = {
-        1: ['Tea', 'Coffee', 'Iced Tea', 'Smoothie', 'Hot Chocolate', 'Milkshake', 'Soda', 'Lemonade', 'Fruit Juice', 'Water'],
-        2: ['Burger', 'Pizza', 'Sandwich', 'Nachos', 'French Fries', 'Chicken Wings', 'Mozzarella Sticks', 'Quesadilla', 'Spring Rolls', 'Pretzels'],
-        3: ['Toy 1', 'Toy 2', 'Toy 3', 'Toy 4', 'Toy 5', 'Toy 6', 'Toy 7', 'Toy 8', 'Toy 9', 'Toy 10'],
-        4: ['Orange Juice', 'Apple Juice', 'Grape Juice', 'Pineapple Juice', 'Cranberry Juice', 'Carrot Juice', 'Tomato Juice', 'Watermelon Juice', 'Coconut Water', 'Mango Juice'],
-        5: ['Fried Chicken', 'Fried Fish', 'Fried Shrimp', 'Fried Calamari', 'Fried Tofu', 'Fried Pickles', 'Fried Okra', 'Fried Zucchini', 'Fried Cheese', 'Fried Mushrooms'],
+        1: [
+          'Tea',
+          'Coffee',
+          'Iced Tea',
+          'Smoothie',
+          'Hot Chocolate',
+          'Milkshake',
+          'Soda',
+          'Lemonade',
+          'Fruit Juice',
+          'Water',
+        ],
+        2: [
+          'Burger',
+          'Pizza',
+          'Sandwich',
+          'Nachos',
+          'French Fries',
+          'Chicken Wings',
+          'Mozzarella Sticks',
+          'Quesadilla',
+          'Spring Rolls',
+          'Pretzels',
+        ],
+        3: [
+          'Toy 1',
+          'Toy 2',
+          'Toy 3',
+          'Toy 4',
+          'Toy 5',
+          'Toy 6',
+          'Toy 7',
+          'Toy 8',
+          'Toy 9',
+          'Toy 10',
+        ],
+        4: [
+          'Orange Juice',
+          'Apple Juice',
+          'Grape Juice',
+          'Pineapple Juice',
+          'Cranberry Juice',
+          'Carrot Juice',
+          'Tomato Juice',
+          'Watermelon Juice',
+          'Coconut Water',
+          'Mango Juice',
+        ],
+        5: [
+          'Fried Chicken',
+          'Fried Fish',
+          'Fried Shrimp',
+          'Fried Calamari',
+          'Fried Tofu',
+          'Fried Pickles',
+          'Fried Okra',
+          'Fried Zucchini',
+          'Fried Cheese',
+          'Fried Mushrooms',
+        ],
       };
 
       const insertMenuItems = await db.execute(`
         INSERT INTO menu_items (name, category_id, price)
         VALUES
         ${Array.from({ length: 50 }, (_, index) => {
-        const categoryId = Math.ceil((index + 1) / 10);
-        const itemName = categoryNames[categoryId][index % 10];
-        const price = Math.floor(Math.random() * (20 - 5) + 5); // Random price between 5 and 20
-        return `('${itemName}', ${categoryId}, ${price})`;
-      }).join(',\n')};
+          const categoryId = Math.ceil((index + 1) / 10);
+          const itemName = categoryNames[categoryId][index % 10];
+          const price = Math.floor(Math.random() * (20 - 5) + 5); // Random price between 5 and 20
+          return `('${itemName}', ${categoryId}, ${price})`;
+        }).join(',\n')};
       `);
 
       console.log('INSERTED USERS:', insertUsers);
@@ -104,20 +155,20 @@ export default function Home() {
 
   const getMenuItems = async () => {
     try {
-      const result = await dbService.getMenuItems()
+      const result = await dbService.getMenuItems();
       setMenuItems(result);
       setFilteredData(result);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   };
   const getCategories = async () => {
     try {
-      const result: Category[] = await dbService.getCategories()
+      const result: Category[] = await dbService.getCategories();
       console.log('categories::::', result);
       setCategories(result);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   };
   const getBillsWithBillItems = async () => {
@@ -162,13 +213,11 @@ export default function Home() {
       });
 
       console.log('BILLS::::', bills);
-
     } catch (error) {
-      console.log('Bill items test', error)
+      console.log('Bill items test', error);
     } finally {
       await db.close();
     }
-
   };
 
   const filterMenuItems = (categoryId: number) => {
@@ -197,15 +246,13 @@ export default function Home() {
 
   const saveBill = async () => {
     try {
-      const insertBill = await dbService.insertBill(
-        [TotalAmount, new Date()]
-      );
+      const insertBill = await dbService.insertBill([TotalAmount, new Date()]);
       console.log('INSERTED BILL:', insertBill);
 
       const billId = insertBill.lastInsertId;
       console.log('BILL ID:', billId);
       // insert billItems for the bill
-      await dbService.bulkInsertBillItems(billItems, billId)
+      await dbService.bulkInsertBillItems(billItems, billId);
       // await Promise.all(
       //   billItems.map((billItem) => {
       //     return dbService.insertBillItems(
@@ -213,8 +260,11 @@ export default function Home() {
       //     );
       //   })
       // );
-      setBillItems([])
-      toast('Bill saved successfully', { position: 'top-center', duration: 1000 })
+      setBillItems([]);
+      toast('Bill saved successfully', {
+        position: 'top-center',
+        duration: 1000,
+      });
     } catch (error) {
       console.error('Error saving bill:', error);
     }
@@ -226,108 +276,185 @@ export default function Home() {
 
   const clearBill = () => {
     setBillItems([]);
-  }
+  };
 
   return (
-      <div className={`flex flex-row w-full`} style={{ height: "calc(100% - 1.75rem)"}}>
-        {/* // Nav Container */}
+    <div
+      className={`flex w-full flex-row`}
+      style={{ height: 'calc(100% - 1.75rem)' }}
+    >
+      {/* // Nav Container */}
 
-          <div className="w-1/2 min-w-96 py-2 px-2 h-full">
-            <div className="flex flex-col h-full">
-              {/* input */}
-              <div className="flex flex-col w-full h-12">
-                {/* <Input
+      <div className="h-full w-1/2 min-w-96 px-2 py-2">
+        <div className="flex h-full flex-col">
+          {/* input */}
+          <div className="flex h-12 w-full flex-col">
+            {/* <Input
                   className="w-full p-6 border border-zinc-700 rounded-none"
                   type="search"
                   placeholder="Press space to start search or click on the input box"
                   onChange={(e) => searchItem(e.target.value)}
                 /> */}
-                <SearchComponent data={filteredData} />
+            <SearchComponent data={filteredData} />
+          </div>
+          {/* cat and menu container */}
+          <div
+            className="mt-2 flex flex-row border border-zinc-700"
+            style={{ height: 'calc(100% - 3.5rem)' }}
+          >
+            {/* category */}
+            <div className="min-w-28 border-r border-zinc-700 p-1">
+              <div
+                onClick={() => {
+                  setSelectedCategory(-1);
+                  filterMenuItems(-1);
+                }}
+                className={cn('p-2 hover:bg-zinc-700', {
+                  'bg-zinc-700': selectedCategory === -1 || !selectedCategory,
+                })}
+              >
+                {'All'}
               </div>
-              {/* cat and menu container */}
-              <div className="border border-zinc-700 mt-2 flex flex-row"   style={{ height: "calc(100% - 3.5rem)"}}>
-                {/* category */}
-                <div className="min-w-28 p-1 border-r border-zinc-700">
-                  <div
-                    onClick={() => {
-                      setSelectedCategory(-1);
-                      filterMenuItems(-1);
-                    }}
-                    className={cn('hover:bg-zinc-700 p-2', {
-                      'bg-zinc-700':
-                        selectedCategory === -1 || !selectedCategory,
-                    })}
-                  >
-                    {'All'}
-                  </div>
-                  {categories.map((category) => (
-                    <div
-                      onClick={() => {
-                        setSelectedCategory(category.id);
-                        filterMenuItems(category.id);
-                      }}
-                      className={cn('hover:bg-zinc-700  p-2', {
-                        'bg-zinc-700 border-y border-zinc-600':
-                          selectedCategory === category.id,
-                      })}
-                      key={category.id}
-                    >
-                      {category.name.toLocaleUpperCase()}
-                    </div>
-                  ))}
+              {categories.map((category) => (
+                <div
+                  onClick={() => {
+                    setSelectedCategory(category.id);
+                    filterMenuItems(category.id);
+                  }}
+                  className={cn('p-2  hover:bg-zinc-700', {
+                    'border-y border-zinc-600 bg-zinc-700':
+                      selectedCategory === category.id,
+                  })}
+                  key={category.id}
+                >
+                  {category.name.toLocaleUpperCase()}
                 </div>
-                {/* menu items */}
-                <div className="min-w-96 p-1 flex-1 overflow-y-auto">
-                  {filteredData.map((item) => (
-                    <div
-                      onClick={() => addItemToBill(item)}
-                      className="hover:bg-zinc-700 p-2"
-                      key={item.id}
-                    >
-                      {item.name} ::
-                      {' Rs.'}
-                      {item.price}
-                    </div>
-                  ))}
+              ))}
+            </div>
+            {/* menu items */}
+            <div className="min-w-96 flex-1 overflow-y-auto p-1">
+              {filteredData.map((item) => (
+                <div
+                  onClick={() => addItemToBill(item)}
+                  className="p-2 hover:bg-zinc-700"
+                  key={item.id}
+                >
+                  {item.name} ::
+                  {' Rs.'}
+                  {item.price}
                 </div>
-              </div>
+              ))}
             </div>
           </div>
-          <div className="h-full w-1/2 min-w-96 py-2 pr-2">
-            <div className="border border-zinc-700 flex flex-col h-full flex-1 overflow-y-auto">
-              <div className="flex flex-row justify-between p-2">
-                <div className="text-xl">Bill</div>
-                <div className="text-xl">Total: Rs. {TotalAmount}</div>
-              </div>
-              <div className="flex flex-col p-2">
+        </div>
+      </div>
+      <div className="h-full w-1/2 min-w-96 py-2 pr-2">
+        <div className="flex h-full flex-1 flex-col overflow-y-auto border border-zinc-700">
+          <div className="flex flex-row justify-between p-4">
+            <div className="text-xl">Bill</div>
+            <div className="text-xl">Total: Rs. {TotalAmount}</div>
+          </div>
+          <div className="flex flex-1 flex-col overflow-y-scroll p-4">
+            <table className="table-auto">
+              <thead className="bg-zinc-700">
+                <tr>
+                  <th className="py-1 px-4 text-left">Item</th>
+                  <th className="py-1 px-4">Qty</th>
+                  <th className="py-1 px-4">Price</th>
+                  <th className="py-1 px-4">Action</th>
+                </tr>
+              </thead>
+              <tbody>
                 {billItems.map((billItem) => (
-                  <div
-                    className="flex flex-row justify-between"
+                  <tr
+                    className="border-y border-zinc-800"
                     key={billItem.item.id}
                   >
-                    <div>{billItem.item.name}</div>
-                    <div>{billItem.quantity}</div>
-                    <div>{billItem.item.price}</div>
-                  </div>
+                    <td className="w-56 py-1 px-4">{billItem.item.name}</td>
+                    <td className="text-center py-1 px-2">
+                      <button
+                        className="px-2 bg-zinc-700 rounded-sm border border-zinc-500"
+                        onClick={() => {
+                          const newQuantity = billItem.quantity - 1;
+                          if (newQuantity < 1) return;
+                          const updatedBillItems = billItems.map((item) => {
+                            if (item.item.id === billItem.item.id) {
+                              return { ...item, quantity: newQuantity };
+                            }
+                            return item;
+                          });
+                          setBillItems(updatedBillItems);
+                        }}
+                      >
+                        -
+                      </button>
+                      <input
+                        className="w-14 p-1 border border-zinc-700 rounded-sm text-center"
+                        type="number"
+                        value={billItem.quantity}
+                        onChange={(e) => {
+                          const newQuantity = parseInt(e.target.value);
+                          const updatedBillItems = billItems.map((item) => {
+                            if (item.item.id === billItem.item.id) {
+                              return { ...item, quantity: newQuantity };
+                            }
+                            return item;
+                          });
+                          setBillItems(updatedBillItems);
+                        }}
+                      />
+                      <button
+                        className="px-2 bg-zinc-700 rounded-sm border border-zinc-500"
+                        onClick={() => {
+                          const newQuantity = billItem.quantity + 1;
+                          const updatedBillItems = billItems.map((item) => {
+                            if (item.item.id === billItem.item.id) {
+                              return { ...item, quantity: newQuantity };
+                            }
+                            return item;
+                          });
+                          setBillItems(updatedBillItems);
+                        }}
+                      >
+                        +
+                      </button>
+                    </td>
+                    <td className="text-center py-1 px-4">
+                      {billItem.item.price}
+                    </td>
+                    <td className="text-center py-1 px-4">
+                      <button
+                        className="bg-zinc-700 p-2 rounded-sm"
+                        onClick={() => {
+                          const newBillItems = billItems.filter(
+                            (item) => item.item.id !== billItem.item.id
+                          );
+                          setBillItems(newBillItems);
+                        }}
+                      >
+                        <Trash2 />
+                      </button>
+                    </td>
+                  </tr>
                 ))}
-              </div>
-              <div className="flex flex-row justify-between p-2">
-                <div>Sub Total</div>
-                <div>Rs. {TotalAmount}</div>
-                <button className="bg-zinc-700 p-1" onClick={() => clearBill()}>
-                  Clear Bill
-                </button>
-                <button className="bg-zinc-700 p-1" onClick={() => saveBill()}>
-                  Save Bill
-                </button>
-                <button className="bg-zinc-700 p-1" onClick={() => printBill()}>
-                  Print Bill
-                </button>
-              </div>
-            </div>
+              </tbody>
+            </table>
           </div>
-
-
+          <div className="flex flex-row justify-between p-4">
+            <div>Sub Total</div>
+            <div>Rs. {TotalAmount}</div>
+            <button className="bg-zinc-700 p-1" onClick={() => clearBill()}>
+              Clear Bill
+            </button>
+            <button className="bg-zinc-700 p-1" onClick={() => saveBill()}>
+              Save Bill
+            </button>
+            <button className="bg-zinc-700 p-1" onClick={() => printBill()}>
+              Print Bill
+            </button>
+          </div>
+        </div>
       </div>
+    </div>
   );
 }

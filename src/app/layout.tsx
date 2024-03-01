@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import Link from "next/link";
+import { MenuSquare } from "lucide-react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,23 +27,23 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <main className="flex flex-col h-screen max-h-screen min-w-96">
-            <div className="border-b border-zinc-700 bg-zinc-800 flex flex-row justify-start font-light text-sm h-7">
+          <main className="flex h-screen max-h-screen min-w-96 flex-col">
+            <div className="flex h-7 flex-row justify-start border-b border-zinc-700 bg-zinc-800 text-sm font-light">
               <Link
-                href={'/manage-menu'}
-                className="border-zinc-600 text-left hover:bg-zinc-500 px-2 py-1 rounded-sm"
+                href={"/manage-menu"}
+                className="flex items-center gap-1 rounded-sm border-zinc-600 px-2 py-1 text-left hover:bg-zinc-500"
               >
-                Manage menu
+                <MenuSquare size={16} /> Manage menu
               </Link>
               <Link
-                href={'/reports'}
-                className="border-zinc-600 text-center hover:bg-zinc-500 px-2 py-1 rounded-sm"
+                href={"/reports"}
+                className="rounded-sm border-zinc-600 px-2 py-1 text-center hover:bg-zinc-500"
               >
                 Reports
               </Link>
               <Link
-                href={'/bills'}
-                className="border-zinc-600 text-center hover:bg-zinc-500 px-2 py-1 rounded-sm"
+                href={"/bills"}
+                className="rounded-sm border-zinc-600 px-2 py-1 text-center hover:bg-zinc-500"
               >
                 Bills
               </Link>
