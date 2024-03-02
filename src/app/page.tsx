@@ -253,13 +253,6 @@ export default function Home() {
       console.log('BILL ID:', billId);
       // insert billItems for the bill
       await dbService.bulkInsertBillItems(billItems, billId);
-      // await Promise.all(
-      //   billItems.map((billItem) => {
-      //     return dbService.insertBillItems(
-      //       [billId, billItem.item.id, billItem.quantity]
-      //     );
-      //   })
-      // );
       setBillItems([]);
       toast('Bill saved successfully', {
         position: 'top-center',
@@ -358,10 +351,11 @@ export default function Home() {
             <table className="table-auto">
               <thead className="bg-zinc-700">
                 <tr>
-                  <th className="py-1 px-4 text-left">Item</th>
-                  <th className="py-1 px-4">Qty</th>
-                  <th className="py-1 px-4">Price</th>
-                  <th className="py-1 px-4">Action</th>
+                  <th className="font-semibold py-1 px-4 text-left">Item</th>
+                  <th className="font-semibold py-1 px-4">Qty</th>
+                  <th className="font-semibold py-1 px-4">Price</th>
+                  <th className='font-semibold py-1 px-2'>Amount</th>
+                  <th className="font-semibold py-1 px-4">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -421,6 +415,9 @@ export default function Home() {
                     </td>
                     <td className="text-center py-1 px-4">
                       {billItem.item.price}
+                    </td>
+                    <td className="text-center py-1 px-4">
+                      {billItem.quantity * billItem.item.price}
                     </td>
                     <td className="text-center py-1 px-4">
                       <button
