@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import Link from "next/link";
 import { MenuSquare } from "lucide-react";
+import { ModeToggle } from "@/components/mode-toggle";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,30 +24,33 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="light"
           enableSystem
           disableTransitionOnChange
         >
-          <main className="flex h-screen max-h-screen min-w-96 flex-col">
-            <div className="flex h-7 flex-row justify-start border-b border-zinc-700 bg-zinc-800 text-sm font-light">
+          <main className="flex h-screen max-h-screen min-w-96 flex-col bg-background">
+            <div className="flex h-7 px-2 flex-row border-b border-border bg-background text-sm font-light items-center justify-between">
+              <div className="flex flex-row">
               <Link
                 href={"/manage-menu"}
-                className="flex items-center gap-1 rounded-sm border-zinc-600 px-2 py-1 text-left hover:bg-zinc-500"
+                className="text-foreground flex items-center gap-1 rounded-sm border-border px-2 py-1 text-left hover:bg-accent"
               >
-                <MenuSquare size={16} /> Manage menu
+                Manage menu
               </Link>
               <Link
                 href={"/reports"}
-                className="rounded-sm border-zinc-600 px-2 py-1 text-center hover:bg-zinc-500"
+                className="text-foreground rounded-sm border-border px-2 py-1 text-center hover:bg-accent"
               >
                 Reports
               </Link>
               <Link
                 href={"/bills"}
-                className="rounded-sm border-zinc-600 px-2 py-1 text-center hover:bg-zinc-500"
+                className="text-foreground rounded-sm border-border px-2 py-1 text-center hover:bg-accent"
               >
                 Bills
               </Link>
+              </div>
+              <ModeToggle />
             </div>
             {children}
           </main>

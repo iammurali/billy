@@ -8,7 +8,9 @@ import { toast } from 'sonner';
 import { DatabaseService } from '@/lib/db';
 import { cn } from '@/lib/utils';
 import SearchComponent from '@/components/search-component';
-import { Trash2 } from 'lucide-react';
+import { Minus, MinusCircle, Plus, PlusCircle, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 const dbService = new DatabaseService();
 
@@ -136,11 +138,11 @@ export default function Home() {
         INSERT INTO menu_items (name, category_id, price)
         VALUES
         ${Array.from({ length: 50 }, (_, index) => {
-          const categoryId = Math.ceil((index + 1) / 10);
-          const itemName = categoryNames[categoryId][index % 10];
-          const price = Math.floor(Math.random() * (20 - 5) + 5); // Random price between 5 and 20
-          return `('${itemName}', ${categoryId}, ${price})`;
-        }).join(',\n')};
+        const categoryId = Math.ceil((index + 1) / 10);
+        const itemName = categoryNames[categoryId][index % 10];
+        const price = Math.floor(Math.random() * (20 - 5) + 5); // Random price between 5 and 20
+        return `('${itemName}', ${categoryId}, ${price})`;
+      }).join(',\n')};
       `);
 
       console.log('INSERTED USERS:', insertUsers);
@@ -283,7 +285,7 @@ export default function Home() {
           {/* input */}
           <div className="flex h-12 w-full flex-col">
             {/* <Input
-                  className="w-full p-6 border border-zinc-700 rounded-none"
+                  className="w-full p-6 border border-border rounded-none"
                   type="search"
                   placeholder="Press space to start search or click on the input box"
                   onChange={(e) => searchItem(e.target.value)}
@@ -292,18 +294,18 @@ export default function Home() {
           </div>
           {/* cat and menu container */}
           <div
-            className="mt-2 flex flex-row border border-zinc-700"
+            className="mt-2 flex flex-row border border-border"
             style={{ height: 'calc(100% - 3.5rem)' }}
           >
             {/* category */}
-            <div className="min-w-28 border-r border-zinc-700 p-1">
+            <div className="min-w-28 border-r border-border p-1">
               <div
                 onClick={() => {
                   setSelectedCategory(-1);
                   filterMenuItems(-1);
                 }}
-                className={cn('p-2 hover:bg-zinc-700', {
-                  'bg-zinc-700': selectedCategory === -1 || !selectedCategory,
+                className={cn('p-2 hover:bg-accent', {
+                  'bg-accent': selectedCategory === -1 || !selectedCategory,
                 })}
               >
                 {'All'}
@@ -314,8 +316,8 @@ export default function Home() {
                     setSelectedCategory(category.id);
                     filterMenuItems(category.id);
                   }}
-                  className={cn('p-2  hover:bg-zinc-700', {
-                    'border-y border-zinc-600 bg-zinc-700':
+                  className={cn('p-2  hover:bg-accent', {
+                    'border-y border-border bg-accent':
                       selectedCategory === category.id,
                   })}
                   key={category.id}
@@ -325,11 +327,11 @@ export default function Home() {
               ))}
             </div>
             {/* menu items */}
-            <div className="min-w-96 flex-1 overflow-y-auto p-1">
+            <div className="flex-1 overflow-y-auto p-1 cursor-pointer select-none">
               {filteredData.map((item) => (
                 <div
                   onClick={() => addItemToBill(item)}
-                  className="p-2 hover:bg-zinc-700"
+                  className="p-2 hover:bg-accent"
                   key={item.id}
                 >
                   {item.name} ::
@@ -342,14 +344,14 @@ export default function Home() {
         </div>
       </div>
       <div className="h-full w-1/2 min-w-96 py-2 pr-2">
-        <div className="flex h-full flex-1 flex-col overflow-y-auto border border-zinc-700">
-          <div className="flex flex-row justify-between p-4">
+        <div className="flex h-full flex-1 flex-col overflow-y-auto border border-border">
+          <div className="flex flex-row justify-between p-4 border-b border-border">
             <div className="text-xl">Bill</div>
             <div className="text-xl">Total: Rs. {TotalAmount}</div>
           </div>
           <div className="flex flex-1 flex-col overflow-y-scroll p-4">
-            <table className="table-auto">
-              <thead className="bg-zinc-700">
+            <table className="table-auto bg-card">
+              <thead className="bg-muted">
                 <tr>
                   <th className="font-semibold py-1 px-4 text-left">Item</th>
                   <th className="font-semibold py-1 px-4">Qty</th>
@@ -359,15 +361,17 @@ export default function Home() {
                 </tr>
               </thead>
               <tbody>
-                {billItems.map((billItem) => (
+                {billItems.map((billItem, index) => (
                   <tr
-                    className="border-y border-zinc-800"
+                    className="border-y border-border select-none"
                     key={billItem.item.id}
                   >
-                    <td className="w-56 py-1 px-4">{billItem.item.name}</td>
-                    <td className="text-center py-1 px-2">
-                      <button
-                        className="px-2 bg-zinc-700 rounded-sm border border-zinc-500"
+                    <td className="py-1 px-4">{billItem.item.name}</td>
+                    <td className="flex flex-row text-center py-1 px-2">
+                      <Button
+                        variant="outline" size="icon"
+                        className='mr-1'
+                        // className="px-2 bg-background rounded-sm border border-border-500"
                         onClick={() => {
                           const newQuantity = billItem.quantity - 1;
                           if (newQuantity < 1) return;
@@ -380,10 +384,15 @@ export default function Home() {
                           setBillItems(updatedBillItems);
                         }}
                       >
-                        -
-                      </button>
-                      <input
-                        className="w-14 p-1 border border-zinc-700 rounded-sm text-center"
+                        <Minus />
+                      </Button>
+                      <Input
+                        className="w-8 p-1 borsder border-border rounded-sm text-center"
+                        style={{
+                          WebkitAppearance: 'none',
+                          margin: 0,
+                          MozAppearance: 'textfield'
+                        }}
                         type="number"
                         value={billItem.quantity}
                         onChange={(e) => {
@@ -397,8 +406,10 @@ export default function Home() {
                           setBillItems(updatedBillItems);
                         }}
                       />
-                      <button
-                        className="px-2 bg-zinc-700 rounded-sm border border-zinc-500"
+                      <Button
+                        variant="outline" size="icon"
+                        className='ml-1'
+                        // className="px-2 bg-background rounded-sm border border-border-500"
                         onClick={() => {
                           const newQuantity = billItem.quantity + 1;
                           const updatedBillItems = billItems.map((item) => {
@@ -410,8 +421,8 @@ export default function Home() {
                           setBillItems(updatedBillItems);
                         }}
                       >
-                        +
-                      </button>
+                        <Plus />
+                      </Button>
                     </td>
                     <td className="text-center py-1 px-4">
                       {billItem.item.price}
@@ -420,8 +431,9 @@ export default function Home() {
                       {billItem.quantity * billItem.item.price}
                     </td>
                     <td className="text-center py-1 px-4">
-                      <button
-                        className="bg-zinc-700 p-2 rounded-sm"
+                      <Button
+                        variant="outline" size="icon"
+                        // className="bg-background p-2 rounded-sm"
                         onClick={() => {
                           const newBillItems = billItems.filter(
                             (item) => item.item.id !== billItem.item.id
@@ -430,25 +442,25 @@ export default function Home() {
                         }}
                       >
                         <Trash2 />
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <div className="flex flex-row justify-between p-4">
+          <div className="flex flex-row justify-between p-4 border-t border-border items-center">
             <div>Sub Total</div>
             <div>Rs. {TotalAmount}</div>
-            <button className="bg-zinc-700 p-1" onClick={() => clearBill()}>
+            <Button variant={'default'}  onClick={() => clearBill()}>
               Clear Bill
-            </button>
-            <button className="bg-zinc-700 p-1" onClick={() => saveBill()}>
+            </Button>
+            <Button variant={'default'}  onClick={() => saveBill()}>
               Save Bill
-            </button>
-            <button className="bg-zinc-700 p-1" onClick={() => printBill()}>
+            </Button>
+            <Button variant={'default'}  onClick={() => printBill()}>
               Print Bill
-            </button>
+            </Button>
           </div>
         </div>
       </div>

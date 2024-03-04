@@ -19,7 +19,7 @@ const ReportsPage: React.FC = () => {
 
     return (
         <div className='p-2'>
-            <div className='border border-zinc-500 p-2 flex flex-row items-center'>
+            <div className='border border-border p-2 flex flex-row items-center'>
             <Link href="/" className='p-2 bg-zinc-500'> {`< back`}</Link>
             <h1 className='p-2'>Reports</h1>
 

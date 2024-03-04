@@ -74,8 +74,8 @@ const ManageMenuPage: React.FC = () => {
 
     return (
         <div className='p-2'>
-            <div className='border border-zinc-700 p-2 flex flex-row items-center'>
-            <Link href="/" className='px-2 lg:py-1 bg-zinc-700'> {`< back`}</Link>
+            <div className='border border-border p-2 flex flex-row items-center'>
+            <Link href="/" className='px-2 lg:py-1 bg-background'> {`< back`}</Link>
             <h1 className='p-2 text-sm'>Manage Menu</h1>
 
             </div>

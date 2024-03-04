@@ -28,14 +28,14 @@ const SearchComponent = ({ data }: { data: MenuItem[] }) => {
     return (
         <div className='relative'>
             <Input
-                className="w-full p-6 border border-zinc-700 rounded-none"
+                className="w-full p-6 border border-border rounded-none"
                 type="search"
                 placeholder="Press space to start search or click on the input box"
                 value={searchTerm}
                 onChange={handleSearch}
             />
             {searchTerm !== '' &&
-                (<ul className='bg-zinc-700 mt-[3px] absolute z-50 border border-zinc-500 w-full'>
+                (<ul className='bg-background mt-[3px] absolute z-50 border border-border w-full'>
                     {searchResults.map((result, index) => (
                         <li  className={`p-2 hover:bg-zinc-500 cursor-pointer ${
                             index === selectedItem ? 'bg-lightblue' : ''
