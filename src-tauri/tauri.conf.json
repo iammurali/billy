@@ -13,6 +13,10 @@
   "tauri": {
     "allowlist": {
       "all": false,
+      "window": {
+        "all": true,
+       "print": true
+      },
       "globalShortcut": {
         "all": true
       }

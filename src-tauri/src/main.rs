@@ -42,6 +42,7 @@ fn main() {
 
   tauri::Builder::default()
     .plugin(tauri_plugin_sql::Builder::default().add_migrations("sqlite:billy.db", migrations).build())
+    .plugin(tauri_plugin_printer::init())
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }
